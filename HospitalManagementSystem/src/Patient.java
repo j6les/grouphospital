@@ -1,10 +1,10 @@
 public class Patient {
-    private String firstName;
-    private String lastName;
-    private long patientID;
-    private int age;
-    private boolean isEmergency;
-    private int severity; // Severity scale (1 to 5)
+    private final String firstName;
+    private final String lastName;
+    private final long patientID;
+    private final int age;
+    private final boolean isEmergency;
+    private final int severity; // Severity scale (1 to 5)
 
     // Constructor for new patients
     public Patient(String firstName, String lastName, long patientID, int age, boolean isEmergency, int severity) {

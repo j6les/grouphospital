@@ -27,7 +27,7 @@ public class Main {
 
         do {
             System.out.println("\nPlease enter a number corresponding to the available options.\n");
-            System.out.println("1. Add Patient / Doctor\n2. View Patients / Doctors\n3. Schedule Appointments \n4. View Appointments\n5. Close program");
+            System.out.println("1. Add Patient / Doctor\n2. View Patients / Doctors\n3. Schedule Appointments \n4. View Appointments\n5. View Appointments by Doctor\n6. Close program");
             System.out.print("> ");
             try {
                 choice = scnr.nextInt();
@@ -58,7 +58,7 @@ public class Main {
                                     // Prompts user to enter severity for emergency patients
                                     System.out.print("Enter severity (1-5, where 1 is least severe and 5 is most severe): ");
                                     severity = scnr.nextInt();
-                                    System.out.println("They will be met with right away.");
+                                    System.out.println("\nThey will be met with right away.\n");
                                     // Validate severity input
                                     while (severity < 1 || severity > 5) {
                                         System.out.print("Invalid input! Please enter a severity between 1 and 5: ");
@@ -88,6 +88,13 @@ public class Main {
 
                                 long doctorID = generateRandomID(); // Generate a random 12-digit ID
                                 Doctor newDoctor = new Doctor(firstName, lastName, doctorID);
+
+                                // Prompt the user to input available times
+                                System.out.print("Enter available times for the doctor (comma-separated, e.g., '9:00 AM, 10:00 AM'): ");
+                                String timeInput = scnr.nextLine();
+                                List<String> availableTimes = Arrays.asList(timeInput.split(",\\s*")); // Split and trim the input
+                                newDoctor.setAvailableTimes(availableTimes); // Set available times for the doctor
+
                                 doctors.add(newDoctor);
                                 System.out.println("Doctor added successfully with ID: " + doctorID);
                             } catch (Exception e) {
@@ -119,7 +126,6 @@ public class Main {
                         }
                         break;
                     case 3:
-                        // Schedule Appointments
                         try {
                             if (patientQueue.isEmpty()) {
                                 System.out.println("\nNo patients found. Returning to the main menu.");
@@ -156,9 +162,19 @@ public class Main {
                                 break;
                             }
 
+                            // Check if the selected doctor is available at the specified time
+                            if (!selectedDoctor.isTimeAvailable(appointmentDate)) {
+                                System.out.println("This doctor is already booked at the requested time. Please choose another time.");
+                                break;
+                            }
+
                             System.out.print("Enter the reason for the visit: ");
                             String reason = scnr.nextLine();
 
+                            // Book the time for the doctor
+                            selectedDoctor.bookTime(appointmentDate);
+
+                            // Create and add the appointment
                             Appointment newAppointment = new Appointment(selectedPatient, selectedDoctor, appointmentDate, reason);
                             appointments.add(newAppointment);
                             System.out.println("Appointment scheduled successfully for " + selectedPatient.getFullName() +
@@ -188,16 +204,52 @@ public class Main {
                         }
                         break;
                     case 5:
-                        System.out.println("Closing program...");
+                    // View appointments by doctor
+                    if (doctors.isEmpty()) {
+                        System.out.println("\nNo doctors found. Returning to the main menu.");
+                        break; // Return to main menu if no doctors are available
+                    }
+
+                    System.out.println("\nSelect a doctor to view appointments:");
+                    displayDoctors(doctors);
+                    System.out.print("> ");
+                    int docChoice = scnr.nextInt();
+                    scnr.nextLine(); // Consume newline
+
+                    if (docChoice <= 0 || docChoice > doctors.size()) {
+                        System.out.println("Invalid choice! Returning to the main menu.");
+                    } else {
+                        Doctor selectedDoctor = doctors.get(docChoice - 1); // Adjust for 0-based indexing
+                        System.out.println("Appointments for Dr. " + selectedDoctor.getFullName() + ":");
+                        boolean hasAppointments = false;
+
+                        for (Appointment appointment : appointments) {
+                            if (appointment.getDoctor().equals(selectedDoctor)) {
+                                System.out.println(appointment);
+                                hasAppointments = true;
+                            }
+                        }
+
+                        if (!hasAppointments) {
+                            System.out.println("No appointments found for this doctor.");
+                        }
+                    }
+                    break;
+
+
+                    case 6:
+                        // Exit program
+                        System.out.println("\nExiting program...");
                         break;
+
                     default:
-                        System.out.println("\nWhat you have entered does not correspond to an option available, please try again.");
+                        System.out.println("Invalid option. Please try again.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("\nInvalid input! Please enter a valid number.");
                 scnr.nextLine(); // Clear the buffer
             }
-        } while (choice != 5);
+        } while (choice != 6);
         scnr.close();
     }
 

@@ -1,10 +1,10 @@
 import java.util.Date;
 
 public class Appointment {
-    private Patient patient;
-    private Doctor doctor;
-    private Date appointmentDate;  // Using Date for simplicity (can be modified to use LocalDateTime)
-    private String reason;
+    private final Patient patient;
+    private final Doctor doctor;
+    private final Date appointmentDate;  // Using Date for simplicity (can be modified to use LocalDateTime)
+    private final String reason;
 
     // Constructor
     public Appointment(Patient patient, Doctor doctor, Date appointmentDate, String reason) {
